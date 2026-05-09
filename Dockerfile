@@ -7,16 +7,12 @@ LABEL description="Qwen3-VL FastAPI Inference Service (Sophon BM1684X SE7)"
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN mkdir -p /etc/apt/apt.conf.d/ \
-    && echo 'APT::Update::Post-Invoke {"true";};' > /etc/apt/apt.conf.d/99nocache \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        ffmpeg \
-        libopencv-dev \
-        libgl1-mesa-glx \
-        libglib2.0-0 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libopencv-dev \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && apt-get clean
 
 RUN pip install --no-cache-dir --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip install --no-cache-dir \
