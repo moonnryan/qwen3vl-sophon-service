@@ -3,7 +3,7 @@
 基于算能SE7盒子的Qwen3-VL视觉语言模型FastAPI推理服务，支持多并发、本地媒体文件/文件夹、多图处理、URL媒体资源、视频处理及API Key认证保护，兼容OpenAI ChatCompletion接口格式。
 
 ## 📋 项目信息
-- **模型**: Qwen3-VL-Instruct（2B/4B版本）
+- **模型**: Qwen3-VL-Instruct（2B/4B/8B版本）
 - **硬件**: 算能BM1684X TPU (SE7盒子)
 - **框架**: FastAPI + Sophon BMRuntime + 多线程并发
 - **默认端口**: 8899
@@ -18,21 +18,21 @@
 ```bash
 # 准备模型目录
 cd qwen3-vl-sophon-tpu-serving
-mkdir -p ./models/qwen3vl_4b
+mkdir -p ./models/qwen3vl_2b
 
 # 安装依赖
 pip3 install -r requirements.txt
 
 # 下载算能预编译4B模型（BM1684X，适配2048上下文长度）
 pip install dfss
-python3 -m dfss --url=open@sophgo.com:/ext_model_information/LLM/LLM-TPU/qwen3-vl-4b-instruct_w4bf16_seq2048_bm1684x_1dev_20251026_141347.bmodel
+python3 -m dfss --url=open@sophgo.com:/ext_model_information/LLM/LLM-TPU/qwen3-vl-2b-instruct-w4a16_w4bf16_seq2048_bm1684x_1dev_dynamic_20260318_164243.bmodel
 
 # 克隆算能LLM-TPU仓库，复制配置文件
 git clone https://github.com/sophgo/LLM-TPU.git
-cp -r ./LLM-TPU/models/Qwen3_VL/config/* ./models/qwen3vl_4b/
+cp -r ./LLM-TPU/models/Qwen3_VL/config/* ./models/qwen3vl_4b/ && rm -rf ./LLM-TPU/
 
 # 移动模型文件到对应目录
-mv qwen3-vl-4b-instruct_w4bf16_seq2048_bm1684x_1dev_20251026_141347.bmodel ./models/qwen3vl_4b/
+mv qwen3-vl-2b-instruct-w4a16_w4bf16_seq2048_bm1684x_1dev_dynamic_20260318_164243.bmodel ./models/qwen3vl_2b/
 ```
 
 #### 1.2 （可选）手动编译模型
@@ -40,23 +40,23 @@ mv qwen3-vl-4b-instruct_w4bf16_seq2048_bm1684x_1dev_20251026_141347.bmodel ./mod
 ```bash
 # 1. 下载原始模型（ModelScope）
 pip install modelscope
-modelscope download --model Qwen/Qwen3-VL-4B-Instruct --local_dir Qwen3-VL-4B-Instruct
+modelscope download --model Qwen/Qwen3-VL-2B-Instruct --local_dir Qwen3-VL-2B-Instruct
 
 # 2. 启动算能编译容器
 docker pull sophgo/tpuc_dev:latest
 docker run --privileged --name qwen3vl_compile -v $PWD:/workspace -it sophgo/tpuc_dev:latest
 
 # 3. 编译生成bmodel（容器内执行，适配4B模型/768x768分辨率）
-llm_convert.py -m /workspace/Qwen3-VL-4B-Instruct  -s 2048 \
+llm_convert.py -m /workspace/Qwen3-VL-2B-Instruct  -s 2048 \
   --max_input_length 1024  --quantize w4bf16  -c bm1684x \
-  --out_dir /workspace/models/qwen3vl_4b  --max_pixels 768,768
+  --out_dir /workspace/models/qwen3vl_2b  --max_pixels 768,768
 ```
 
 ### 2. 启动服务
 #### 2.1 基础启动
 ```bash
 # 启动4B模型（默认配置，启用API Key认证）
-python main_serving.py -m ./models/qwen3vl_4b
+python main_serving.py -m ./models/qwen3vl_2b
 ```
 
 #### 2.2 自定义参数启动
@@ -64,19 +64,19 @@ python main_serving.py -m ./models/qwen3vl_4b
 # 示例：2B模型 + 端口9000 + 最大并发15 + 自定义API Key + 视频采样0.3
 python main_serving.py \
   -m ./models/qwen3vl_2b \
-  -p 9000 \
-  -c 15 \
+  -p 8899 \
+  -c 10 \
   -l DEBUG \
   -d 0 \
-  -v 0.3 \
-  --api-key "your_secure_api_key_here" \
+  -v 0.5 \
+  --api-key "your_secure_api_key" \
   --api-header "X-API-Key"
 ```
 
 #### 2.3 后台运行
 ```bash
 # 后台启动并输出日志
-nohup python main_serving.py -m ./models/qwen3vl_4b > service.log 2>&1 &
+nohup python main_serving.py -m ./models/qwen3vl_2b > service.log 2>&1 &
 
 # 查看实时日志
 tail -f service.log
