@@ -11,8 +11,7 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     libopencv-dev \
     libgl1-mesa-glx \
-    libglib2.0-0 \
-    && apt-get clean
+    libglib2.0-0
 
 RUN pip install --no-cache-dir --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip install --no-cache-dir \
