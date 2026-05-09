@@ -38,11 +38,9 @@ echo "服务端口：${PORT}"
 echo "API Key：${API_KEY:-未设置}"
 echo "========================"
 
-echo "===== 停止并删除旧容器 $CONTAINER_NAME ====="
 docker stop $CONTAINER_NAME >/dev/null 2>&1
 docker rm $CONTAINER_NAME >/dev/null 2>&1
 
-echo "===== 启动新容器 $CONTAINER_NAME ====="
 docker run -d \
   --name $CONTAINER_NAME \
   --privileged \
