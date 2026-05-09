@@ -77,7 +77,7 @@ def parse_args():
     parser.add_argument(
         "--api-key",
         type=str,
-        default=None,
+        default="abc@123",
         help="API访问密钥（可选），若设置则所有受保护接口必须携带该密钥访问"
     )
     parser.add_argument(
