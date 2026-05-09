@@ -1,5 +1,5 @@
 #!/bin/bash
-CONTAINER_NAME="qwen3vl-serving"
+CONTAINER_NAME="qwen3vl-sophon-service"
 IMAGE_NAME="sophon-qwen3vl-serving:py310"
 CODE_PATH=$(pwd)
 
