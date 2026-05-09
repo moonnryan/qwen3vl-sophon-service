@@ -17,7 +17,7 @@
 #### 1.1 下载预编译模型文件（推荐）
 ```bash
 # 准备模型目录
-cd qwen3-vl-sophon-tpu-serving
+cd qwen3vl-sophon-service
 mkdir -p ./models/qwen3vl_2b
 
 # 安装依赖
@@ -35,7 +35,7 @@ cp -r ./LLM-TPU/models/Qwen3_VL/config/* ./models/qwen3vl_4b/ && rm -rf ./LLM-TP
 mv qwen3-vl-2b-instruct-w4a16_w4bf16_seq2048_bm1684x_1dev_dynamic_20260318_164243.bmodel ./models/qwen3vl_2b/
 ```
 
-#### 1.2 （可选）手动编译模型
+#### 1.2 手动编译模型（可选）
 如需自定义模型参数，可在x86主机通过算能编译容器生成bmodel：
 ```bash
 # 1. 下载原始模型（ModelScope）
@@ -50,6 +50,14 @@ docker run --privileged --name qwen3vl_compile -v $PWD:/workspace -it sophgo/tpu
 llm_convert.py -m /workspace/Qwen3-VL-2B-Instruct  -s 2048 \
   --max_input_length 1024  --quantize w4bf16  -c bm1684x \
   --out_dir /workspace/models/qwen3vl_2b  --max_pixels 768,768
+```
+
+#### 1.3 手动编译chat.cpython（可选）
+如需自定义chat.cpp，需要重新编译库文件，生成chat.cpython*.so文件，将该文件拷贝到pipeline.py文件目录：
+```bash
+cd qwen3vl-sophon-service
+mkdir build 
+cd build && cmake .. && make && cp *cpython* .. && cd ..
 ```
 
 ### 2. 启动服务
