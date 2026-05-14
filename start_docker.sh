@@ -46,7 +46,7 @@ echo "API Key：${API_KEY:-未设置}"
 echo "======================================================"
 
 # 1. 检查本地是否已存在目标镜像
-if docker images -q "${LOCAL_IMAGE}" > /dev/null 2>&1; then
+if docker images --format "{{.Repository}}:{{.Tag}}" | grep -q "^${LOCAL_IMAGE}$"; then
     echo -e "\n✅ 检测到本地镜像：${LOCAL_IMAGE}，直接使用"
 else
     echo -e "\n❌ 未检测到本地镜像，尝试加载本地tar包..."
